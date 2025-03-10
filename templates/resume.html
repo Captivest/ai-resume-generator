@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generated Resume</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
     <style>
         body {
             background-color: #f8f9fa;
@@ -56,19 +57,17 @@
             margin-bottom: 5px;
         }
 
-        /* Ad Spaces - Two stacked ads per side */
+        /* Ad Spaces */
         .ad-container {
             display: flex;
             flex-direction: column;
             gap: 10px;
             padding: 20px;
-            /* Space between ads */
         }
 
         .ad-space {
             width: 200px;
             height: 300px;
-            /* Adjust height so two fit properly */
             background: #ddd;
             display: flex;
             align-items: center;
@@ -77,7 +76,6 @@
             color: #555;
         }
 
-        /* Mobile-Friendly Ads */
         @media (max-width: 768px) {
             .ad-container {
                 flex-direction: row;
@@ -109,6 +107,7 @@
             text-decoration: none;
         }
     </style>
+
     <!-- ✅ Load jsPDF Correctly -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
@@ -124,26 +123,10 @@
 
 <body>
     <div class="container page-container">
-        <!-- Left Ad Space (2 Ads) -->
+        <!-- Left Ad Space -->
         <div class="ad-container">
-            <div class="ad-space">
-                <!-- ✅ First AdSense Ad -->
-                <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-                <ins class="adsbygoogle" style="display:block" data-ad-client="YOUR-ADSENSE-ID"
-                    data-ad-slot="YOUR-AD-SLOT-ID-1" data-ad-format="auto" data-full-width-responsive="true"></ins>
-                <script>
-                    (adsbygoogle = window.adsbygoogle || []).push({});
-                </script>
-            </div>
-            <div class="ad-space">
-                <!-- ✅ Second AdSense Ad -->
-                <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-                <ins class="adsbygoogle" style="display:block" data-ad-client="YOUR-ADSENSE-ID"
-                    data-ad-slot="YOUR-AD-SLOT-ID-2" data-ad-format="auto" data-full-width-responsive="true"></ins>
-                <script>
-                    (adsbygoogle = window.adsbygoogle || []).push({});
-                </script>
-            </div>
+            <div class="ad-space">Ad Here</div>
+            <div class="ad-space">Ad Here</div>
         </div>
 
         <!-- Resume Container -->
@@ -184,25 +167,10 @@
                 <p>{{ resume['projects']|replace('\n', '<br>')|safe }}</p>
             </div>
 
-            <!-- ✅ PDF Download Button (Detects Vercel) -->
-            {% if is_vercel %}
+            <!-- ✅ PDF Download Button -->
             <button onclick="downloadResume()" class="btn btn-success w-100 mt-3">Download as PDF</button>
-            {% else %}
-            <!-- Download Resume Button -->
-            <form method="POST" action="/download">
-                <input type="hidden" name="name" value="{{ name }}">
-                <input type="hidden" name="summary" value="{{ resume['summary'] }}">
-                <input type="hidden" name="skills" value="{{ resume['skills'] }}">
-                <input type="hidden" name="experience" value="{{ resume['experience'] }}">
-                <input type="hidden" name="education" value="{{ resume['education'] }}">
-                <input type="hidden" name="certifications" value="{{ resume['certifications'] }}">
-                <input type="hidden" name="projects" value="{{ resume['projects'] }}">
 
-                <button type="submit" class="btn btn-success w-100 mt-3">Download as PDF</button>
-            </form>
-            {% endif %}
-
-            <!-- ✅ Affiliate Link Box -->
+            <!-- ✅ Affiliate Box -->
             <div class="affiliate-box">
                 <p>Upgrade your resume with a professionally designed template!
                     <a href="YOUR_AFFILIATE_LINK_HERE" target="_blank">Click here to get started.</a>
@@ -210,30 +178,14 @@
             </div>
         </div>
 
-        <!-- Right Ad Space (2 Ads) -->
+        <!-- Right Ad Space -->
         <div class="ad-container">
-            <div class="ad-space">
-                <!-- ✅ Third AdSense Ad -->
-                <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-                <ins class="adsbygoogle" style="display:block" data-ad-client="YOUR-ADSENSE-ID"
-                    data-ad-slot="YOUR-AD-SLOT-ID-3" data-ad-format="auto" data-full-width-responsive="true"></ins>
-                <script>
-                    (adsbygoogle = window.adsbygoogle || []).push({});
-                </script>
-            </div>
-            <div class="ad-space">
-                <!-- ✅ Fourth AdSense Ad -->
-                <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-                <ins class="adsbygoogle" style="display:block" data-ad-client="YOUR-ADSENSE-ID"
-                    data-ad-slot="YOUR-AD-SLOT-ID-4" data-ad-format="auto" data-full-width-responsive="true"></ins>
-                <script>
-                    (adsbygoogle = window.adsbygoogle || []).push({});
-                </script>
-            </div>
+            <div class="ad-space">Ad Here</div>
+            <div class="ad-space">Ad Here</div>
         </div>
     </div>
 
-    <!-- ✅ jsPDF Script -->
+    <!-- ✅ Updated jsPDF Download Script -->
     <script>
         function downloadResume() {
             // ✅ Ensure jsPDF is loaded before running the function
@@ -248,13 +200,23 @@
             const { jsPDF } = window.jspdf;
             let doc = new jsPDF();
 
-            let resumeContainer = document.getElementById("resume-content");
+            // ✅ Select the resume container correctly
+            let resumeContainer = document.querySelector(".resume-container");
+            if (!resumeContainer) {
+                alert("Error: Resume content not found. Please regenerate your resume.");
+                console.error("❌ Element .resume-container not found.");
+                return;
+            }
+
             let resumeText = "";
 
-            // ✅ Extract text properly
+            // ✅ Extract and format the text properly
             resumeContainer.querySelectorAll(".resume-section").forEach(section => {
-                let title = section.querySelector("h3").innerText;
-                let content = section.querySelector("p") ? section.querySelector("p").innerText : "";
+                let titleElement = section.querySelector("h3");
+                let contentElement = section.querySelector("p, ul");
+
+                let title = titleElement ? titleElement.innerText : "Untitled Section";
+                let content = contentElement ? contentElement.innerText : "No content available";
 
                 resumeText += title + "\n" + content + "\n\n";
             });
@@ -262,6 +224,8 @@
             doc.setFontSize(12);
             doc.text(resumeText, 10, 10, { maxWidth: 180 }); // ✅ Ensures proper text wrapping
             doc.save("resume.pdf");
+
+            console.log("✅ PDF successfully generated and downloaded.");
         }
     </script>
 
