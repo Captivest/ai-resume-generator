@@ -131,7 +131,7 @@
 
         <!-- Resume Container -->
         <div class="resume-container">
-            <h2>{{ name }}</h2>
+            <h2 class="name">{{ name }}</h2>
 
             <div class="resume-section">
                 <h3>Professional Summary</h3>
@@ -210,6 +210,8 @@
 
             let resumeText = "";
 
+            resumeText += resumeContainer.querySelector(".name").innerText + "\n\n";
+
             // ✅ Extract and format the text properly
             resumeContainer.querySelectorAll(".resume-section").forEach(section => {
                 let titleElement = section.querySelector("h3");
@@ -218,7 +220,7 @@
                 let title = titleElement ? titleElement.innerText : "Untitled Section";
                 let content = contentElement ? contentElement.innerText : "No content available";
 
-                resumeText += title + "\n" + content + "\n\n";
+                resumeText += title + "\n\n" + content + "\n\n";
             });
 
             doc.setFontSize(12);
