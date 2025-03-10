@@ -2,4 +2,4 @@ flask
 openai
 python-dotenv
 pdfkit
-gunicorn
+wkhtmltopdf

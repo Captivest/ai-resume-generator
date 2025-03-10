@@ -1,4 +1,5 @@
 import json
+import platform
 from flask import Flask, render_template, request, send_file
 from openai import OpenAI
 import pdfkit
@@ -11,8 +12,11 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 app = Flask(__name__)
 
-# Ensure wkhtmltopdf is installed (Windows path example)
-PDF_CONFIG = pdfkit.configuration(wkhtmltopdf="C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe")
+# ✅ Detect OS and Set the Correct wkhtmltopdf Path
+if platform.system() == "Windows":
+    PDF_CONFIG = pdfkit.configuration(wkhtmltopdf="C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe")
+else:
+    PDF_CONFIG = pdfkit.configuration(wkhtmltopdf="/usr/bin/wkhtmltopdf")  # ✅ Vercel/Linux path
 
 universal_sections=dict()
 
