@@ -173,6 +173,10 @@
                 <p>{{ resume['projects']|replace('\n', '<br>')|safe }}</p>
             </div>
 
+            <!-- ✅ PDF Download Button (Detects Vercel) -->
+            {% if is_vercel %}
+            <button onclick="downloadResume()" class="btn btn-success w-100 mt-3">Download as PDF</button>
+            {% else %}
             <!-- Download Resume Button -->
             <form method="POST" action="/download">
                 <input type="hidden" name="name" value="{{ name }}">
@@ -185,6 +189,7 @@
 
                 <button type="submit" class="btn btn-success w-100 mt-3">Download as PDF</button>
             </form>
+            {% endif %}
 
             <!-- ✅ Affiliate Link Box -->
             <div class="affiliate-box">
@@ -216,6 +221,17 @@
             </div>
         </div>
     </div>
+
+    <!-- ✅ jsPDF Script -->
+    <script>
+        function downloadResume() {
+            const { jsPDF } = window.jspdf;
+            let doc = new jsPDF();
+            let resumeContent = document.getElementById("resume-content").innerText;
+            doc.text(resumeContent, 10, 10);
+            doc.save("resume.pdf");
+        }
+    </script>
 </body>
 
 </html>
