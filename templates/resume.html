@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generated Resume</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+
+        .page-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .resume-container {
+            max-width: 800px;
+            background: white;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        h2 {
+            text-align: center;
+            text-transform: uppercase;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        h3 {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 15px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
+        }
+
+        .resume-section {
+            margin-bottom: 15px;
+        }
+
+        .resume-section ul {
+            padding-left: 20px;
+        }
+
+        .resume-section li {
+            margin-bottom: 5px;
+        }
+
+        /* Ad Spaces - Two stacked ads per side */
+        .ad-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 20px;
+            /* Space between ads */
+        }
+
+        .ad-space {
+            width: 200px;
+            height: 300px;
+            /* Adjust height so two fit properly */
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #555;
+        }
+
+        /* Mobile-Friendly Ads */
+        @media (max-width: 768px) {
+            .ad-container {
+                flex-direction: row;
+                justify-content: center;
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+
+            .ad-space {
+                width: 100%;
+                height: auto;
+                text-align: center;
+            }
+        }
+
+        /* Affiliate Box */
+        .affiliate-box {
+            margin-top: 20px;
+            text-align: center;
+            padding: 10px;
+            border: 2px dashed #007bff;
+            background-color: #eef5ff;
+            border-radius: 8px;
+        }
+
+        .affiliate-box a {
+            color: #007bff;
+            font-weight: bold;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container page-container">
+        <!-- Left Ad Space (2 Ads) -->
+        <div class="ad-container">
+            <div class="ad-space">
+                <!-- ✅ First AdSense Ad -->
+                <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+                <ins class="adsbygoogle" style="display:block" data-ad-client="YOUR-ADSENSE-ID"
+                    data-ad-slot="YOUR-AD-SLOT-ID-1" data-ad-format="auto" data-full-width-responsive="true"></ins>
+                <script>
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            </div>
+            <div class="ad-space">
+                <!-- ✅ Second AdSense Ad -->
+                <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+                <ins class="adsbygoogle" style="display:block" data-ad-client="YOUR-ADSENSE-ID"
+                    data-ad-slot="YOUR-AD-SLOT-ID-2" data-ad-format="auto" data-full-width-responsive="true"></ins>
+                <script>
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            </div>
+        </div>
+
+        <!-- Resume Container -->
+        <div class="resume-container">
+            <h2>{{ name }}</h2>
+
+            <div class="resume-section">
+                <h3>Professional Summary</h3>
+                <p>{{ resume['summary']|replace('\n', '<br>')|safe }}</p>
+            </div>
+
+            <div class="resume-section">
+                <h3>Technical Skills</h3>
+                <ul>
+                    {% for skill in resume['skills'].split('\n') if skill.strip() %}
+                    <li>{{ skill }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="resume-section">
+                <h3>Professional Experience</h3>
+                <p>{{ resume['experience']|replace('\n', '<br>')|safe }}</p>
+            </div>
+
+            <div class="resume-section">
+                <h3>Education</h3>
+                <p>{{ resume['education']|replace('\n', '<br>')|safe }}</p>
+            </div>
+
+            <div class="resume-section">
+                <h3>Certifications</h3>
+                <p>{{ resume['certifications']|replace('\n', '<br>')|safe }}</p>
+            </div>
+
+            <div class="resume-section">
+                <h3>Projects</h3>
+                <p>{{ resume['projects']|replace('\n', '<br>')|safe }}</p>
+            </div>
+
+            <!-- Download Resume Button -->
+            <form method="POST" action="/download">
+                <input type="hidden" name="name" value="{{ name }}">
+                <input type="hidden" name="summary" value="{{ resume['summary'] }}">
+                <input type="hidden" name="skills" value="{{ resume['skills'] }}">
+                <input type="hidden" name="experience" value="{{ resume['experience'] }}">
+                <input type="hidden" name="education" value="{{ resume['education'] }}">
+                <input type="hidden" name="certifications" value="{{ resume['certifications'] }}">
+                <input type="hidden" name="projects" value="{{ resume['projects'] }}">
+
+                <button type="submit" class="btn btn-success w-100 mt-3">Download as PDF</button>
+            </form>
+
+            <!-- ✅ Affiliate Link Box -->
+            <div class="affiliate-box">
+                <p>Upgrade your resume with a professionally designed template!
+                    <a href="YOUR_AFFILIATE_LINK_HERE" target="_blank">Click here to get started.</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Right Ad Space (2 Ads) -->
+        <div class="ad-container">
+            <div class="ad-space">
+                <!-- ✅ Third AdSense Ad -->
+                <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+                <ins class="adsbygoogle" style="display:block" data-ad-client="YOUR-ADSENSE-ID"
+                    data-ad-slot="YOUR-AD-SLOT-ID-3" data-ad-format="auto" data-full-width-responsive="true"></ins>
+                <script>
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            </div>
+            <div class="ad-space">
+                <!-- ✅ Fourth AdSense Ad -->
+                <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+                <ins class="adsbygoogle" style="display:block" data-ad-client="YOUR-ADSENSE-ID"
+                    data-ad-slot="YOUR-AD-SLOT-ID-4" data-ad-format="auto" data-full-width-responsive="true"></ins>
+                <script>
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
