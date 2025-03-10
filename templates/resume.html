@@ -225,7 +225,7 @@
     <!-- ✅ jsPDF Script -->
     <script>
         function downloadResume() {
-            const { jsPDF } = window.jspdf;
+            const { jsPDF } = window.jspdf.jsPDF;
             let doc = new jsPDF();
             let resumeContent = document.getElementById("resume-content").innerText;
             doc.text(resumeContent, 10, 10);
