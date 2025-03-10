@@ -223,6 +223,8 @@
                 resumeText += title + "\n\n" + content + "\n\n";
             });
 
+            resumeText += "\n\n\n";
+
             doc.setFontSize(12);
             doc.text(resumeText, 10, 10, { maxWidth: 180 }); // ✅ Ensures proper text wrapping
             doc.save("resume.pdf");
