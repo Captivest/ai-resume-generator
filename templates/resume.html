@@ -109,6 +109,17 @@
             text-decoration: none;
         }
     </style>
+    <!-- ✅ Load jsPDF Correctly -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            if (!window.jspdf || !window.jspdf.jsPDF) {
+                console.error("jsPDF failed to load.");
+            } else {
+                console.log("✅ jsPDF Loaded Successfully");
+            }
+        });
+    </script>
 </head>
 
 <body>
@@ -225,13 +236,35 @@
     <!-- ✅ jsPDF Script -->
     <script>
         function downloadResume() {
-            const { jsPDF } = window.jspdf.jsPDF;
+            // ✅ Ensure jsPDF is loaded before running the function
+            if (!window.jspdf || !window.jspdf.jsPDF) {
+                alert("Error: jsPDF failed to load. Please refresh the page and try again.");
+                console.error("❌ jsPDF is not available.");
+                return;
+            }
+
+            console.log("✅ jsPDF is available, starting PDF generation.");
+
+            const { jsPDF } = window.jspdf;
             let doc = new jsPDF();
-            let resumeContent = document.getElementById("resume-content").innerText;
-            doc.text(resumeContent, 10, 10);
+
+            let resumeContainer = document.getElementById("resume-content");
+            let resumeText = "";
+
+            // ✅ Extract text properly
+            resumeContainer.querySelectorAll(".resume-section").forEach(section => {
+                let title = section.querySelector("h3").innerText;
+                let content = section.querySelector("p") ? section.querySelector("p").innerText : "";
+
+                resumeText += title + "\n" + content + "\n\n";
+            });
+
+            doc.setFontSize(12);
+            doc.text(resumeText, 10, 10, { maxWidth: 180 }); // ✅ Ensures proper text wrapping
             doc.save("resume.pdf");
         }
     </script>
+
 </body>
 
 </html>
