@@ -198,7 +198,11 @@
             console.log("✅ jsPDF is available, starting PDF generation.");
 
             const { jsPDF } = window.jspdf;
-            let doc = new jsPDF();
+            let doc = new jsPDF({
+                orientation: "p",
+                unit: "mm",
+                format: "a4"
+            });
 
             // ✅ Select the resume container correctly
             let resumeContainer = document.querySelector(".resume-container");
@@ -208,9 +212,16 @@
                 return;
             }
 
-            let resumeText = "";
+            let y = 10; // Start position on PDF
+            let maxWidth = 180; // ✅ Ensures text does not overflow
 
-            resumeText += resumeContainer.querySelector(".name").innerText + "\n\n";
+            // ✅ Add Name at the top
+            let nameElement = resumeContainer.querySelector(".name");
+            let name = nameElement ? nameElement.innerText : "Your Name";
+            doc.setFontSize(16);
+            doc.setFont("helvetica", "bold");
+            doc.text(name, 10, y);
+            y += 10;
 
             // ✅ Extract and format the text properly
             resumeContainer.querySelectorAll(".resume-section").forEach(section => {
@@ -220,18 +231,36 @@
                 let title = titleElement ? titleElement.innerText : "Untitled Section";
                 let content = contentElement ? contentElement.innerText : "No content available";
 
-                resumeText += title + "\n\n" + content + "\n\n";
+                // ✅ Add section title
+                doc.setFontSize(14);
+                doc.setFont("helvetica", "bold");
+                doc.text(title, 10, y);
+                y += 7;
+
+                doc.setFontSize(12);
+                doc.setFont("helvetica", "normal");
+
+                // ✅ Wrap long text into multiple lines
+                let wrappedText = doc.splitTextToSize(content, maxWidth);
+
+                wrappedText.forEach(line => {
+                    if (y + 10 > 280) { // ✅ If reaching page bottom, add a new page
+                        doc.addPage();
+                        y = 10;
+                    }
+                    doc.text(10, y, line);
+                    y += 7;
+                });
+
+                y += 10; // ✅ Add spacing after each section
             });
 
-            resumeText += "\n\n\n";
-
-            doc.setFontSize(12);
-            doc.text(resumeText, 10, 10, { maxWidth: 180 }); // ✅ Ensures proper text wrapping
+            // ✅ Save the PDF
             doc.save("resume.pdf");
-
-            console.log("✅ PDF successfully generated and downloaded.");
+            console.log("✅ PDF successfully generated with multiple pages.");
         }
     </script>
+
 
 </body>
 
