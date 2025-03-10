@@ -111,9 +111,9 @@ def home():
 
         resume = generate_resume(name, job_title, skills, experience, education, certifications, projects)
 
-        return render_template("resume.html", resume=resume, name=name)
+        return render_template("resume.html", resume=resume, name=name,is_vercel=is_vercel)
 
-    return render_template("index.html", resume={})
+    return render_template("index.html", resume={},is_vercel=is_vercel)
 
 def generate_pdf_online(html_content):
     """Uses an external API to generate a PDF from HTML content."""
