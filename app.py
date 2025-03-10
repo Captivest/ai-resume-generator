@@ -1,6 +1,7 @@
 import json
 import platform
-from flask import Flask, render_template, request, send_file
+import requests
+from flask import Flask, render_template, request, send_file, Response
 from openai import OpenAI
 import pdfkit
 import os
@@ -12,16 +13,18 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 app = Flask(__name__)
 
-# ✅ Detect OS and Set the Correct wkhtmltopdf Path
-if platform.system() == "Windows":
-    PDF_CONFIG = pdfkit.configuration(wkhtmltopdf="C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe")
-else:
-    PDF_CONFIG = pdfkit.configuration(wkhtmltopdf="/usr/bin/wkhtmltopdf")  # ✅ Vercel/Linux path
+# ✅ Detect if running on Vercel
+is_vercel = "VERCEL" in os.environ
+PDF_CONFIG = None
 
-universal_sections=dict()
+# ✅ Use `pdfkit` only if NOT on Vercel
+if not is_vercel:
+    if platform.system() == "Windows":
+        PDF_CONFIG = pdfkit.configuration(wkhtmltopdf="C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe")
+    else:
+        PDF_CONFIG = pdfkit.configuration(wkhtmltopdf="/usr/bin/wkhtmltopdf")
 
 def generate_resume(name, job_title, skills, experience, education, certifications, projects):
-    # Convert comma-separated skills to bullet points
     skills_list = "\n- " + "\n- ".join(skills.split(",")) if skills else ""
 
     prompt = f"""
@@ -56,7 +59,6 @@ def generate_resume(name, job_title, skills, experience, education, certificatio
     ---
     """
 
-    # ✅ Correct OpenAI API request
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[{"role": "user", "content": prompt}],
@@ -64,16 +66,9 @@ def generate_resume(name, job_title, skills, experience, education, certificatio
     )
 
     resume_text = response.choices[0].message.content
-
-    # **Pre-Process Sections for Jinja**
-    sections = extract_sections(resume_text)
-    universal_sections=sections
-
-    return sections
-
+    return extract_sections(resume_text)
 
 def extract_sections(resume_text):
-    """ Extracts different sections from the resume and returns them as a dictionary """
     sections = {
         "summary": "",
         "skills": "",
@@ -83,8 +78,7 @@ def extract_sections(resume_text):
         "projects": ""
     }
 
-    parts = resume_text.split("\n\n")  # Split by double newlines
-
+    parts = resume_text.split("\n\n")
     current_section = None
     for part in parts:
         if "**Professional Summary**" in part:
@@ -121,22 +115,39 @@ def home():
 
     return render_template("index.html", resume={})
 
+def generate_pdf_online(html_content):
+    """Uses an external API to generate a PDF from HTML content."""
+    pdf_api_url = "https://api.pdfcrowd.com/convert/html"  # Replace with your preferred PDF API
+    api_key = "YOUR_PDF_API_KEY"  # Sign up for an API key
+
+    response = requests.post(
+        pdf_api_url,
+        json={"html": html_content},
+        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+    )
+
+    if response.status_code == 200:
+        return response.content  # Return the generated PDF binary
+    else:
+        return None
 
 @app.route("/download", methods=["POST"])
 def download_pdf():
-    lineChanger='\n'
-    """ Generates a properly formatted PDF matching the on-screen resume. """
+    lineChanger = '\n'
+    
+    resume_sections = {
+        "name": request.form.get("name", ""),
+        "summary": request.form.get("summary", ""),
+        "skills": request.form.get("skills", ""),
+        "experience": request.form.get("experience", ""),
+        "education": request.form.get("education", ""),
+        "certifications": request.form.get("certifications", ""),
+        "projects": request.form.get("projects", "")
+    }
 
-    # ✅ Extract the resume JSON string from the form
-    raw_resume_data = request.form.get("resume", "{}")
-    resume_sections=json.loads(raw_resume_data.replace("'", '"'))
-    resume_sections=request.form
-
-    # ✅ Function to ensure correct line breaks in PDF
     def format_text(text):
-        return text.replace("\n", "<br>") if text else ""  # Ensure empty text does not return "N/A"
+        return text.replace("\n", "<br>") if text else ""
 
-    # ✅ Create properly formatted HTML for the PDF
     html_resume = f"""
     <!DOCTYPE html>
     <html lang="en">
@@ -209,21 +220,20 @@ def download_pdf():
             <h3>Projects</h3>
             <p>{format_text(resume_sections['projects'])}</p>
         </div>
-
     </body>
     </html>
     """
 
-    # ✅ Generate PDF with properly formatted content
-    pdfkit.from_string(html_resume, "resume.pdf", configuration=PDF_CONFIG)
+    if not is_vercel:
+        pdfkit.from_string(html_resume, "resume.pdf", configuration=PDF_CONFIG)
+        return send_file("resume.pdf", as_attachment=True)
+    
+    # ✅ If running on Vercel, use an online PDF API
+    pdf_binary = generate_pdf_online(html_resume)
+    if pdf_binary:
+        return Response(pdf_binary, mimetype="application/pdf", headers={"Content-Disposition": "attachment; filename=resume.pdf"})
 
-    return send_file("resume.pdf", as_attachment=True)
-
-
-
-
-
-
+    return "PDF generation failed", 500
 
 if __name__ == "__main__":
     app.run(debug=True)
