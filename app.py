@@ -13,9 +13,6 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 app = Flask(__name__)
 
-# Ensure the URL uses the custom domain instead of Vercel
-custom_domain = request.host_url
-
 # ✅ Detect if running on Vercel
 is_vercel = "VERCEL" in os.environ
 PDF_CONFIG = None
@@ -101,7 +98,7 @@ def extract_sections(resume_text):
             sections[current_section] += part.replace("**" + current_section.replace("_", " ").title() + "**", "").strip() + "\n"
     return sections
 
-@app.route(f"{custom_domain}", methods=["GET", "POST"])
+@app.route("/", methods=["GET", "POST"])
 def home():
     if request.method == "POST":
         name = request.form["name"]
@@ -114,9 +111,9 @@ def home():
 
         resume = generate_resume(name, job_title, skills, experience, education, certifications, projects)
 
-        return render_template("resume.html", resume=resume, name=name,is_vercel=is_vercel,custom_domain=custom_domain)
+        return render_template("resume.html", resume=resume, name=name,is_vercel=is_vercel)
 
-    return render_template("index.html", resume={},is_vercel=is_vercel,custom_domain=custom_domain)
+    return render_template("index.html", resume={},is_vercel=is_vercel)
 
 def generate_pdf_online(html_content):
     """Uses an external API to generate a PDF from HTML content."""
@@ -134,7 +131,7 @@ def generate_pdf_online(html_content):
     else:
         return None
 
-@app.route(f"{custom_domain}download", methods=["POST"])
+@app.route("/download", methods=["POST"])
 def download_pdf():
     lineChanger = '\n'
     
